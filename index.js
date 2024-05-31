@@ -25,7 +25,7 @@ app.use(passport.session());
 
 // Routes
 // app.use('/api/users', require('./routes/users'));
-// app.use('/api/questions', require('./routes/questions'));
+
 
 mongoDB().then(() => {
     app.listen(port, () => {
