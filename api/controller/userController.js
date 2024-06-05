@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        user = new User({ firstName, lastName, gender, username, email, password: hashedPassword, phone });
+        user = new User({ name, gender, username, email, password: hashedPassword, phone });
 
         await user.save();
 
@@ -59,10 +59,10 @@ const login = async (req, res) => {
 // Get User Profile
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id).select('profile firstName lastName email username');
+        const user = await User.findById(req.params.id).select('profile name email username');
         if (!user) return res.status(404).json({ msg: 'User not found' });
 
-        const picked = _.pick(user, ['firstName', 'lastName', 'gender', 'username', 'email', 'phone', 'profile']);
+        const picked = _.pick(user, ['name', 'gender', 'username', 'email', 'phone', 'profile']);
 
         res.status(200).json(picked);
     } catch (err) {

@@ -3,8 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema({
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    name: { type: String, required: true },
     gender: { type: String, required: true },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -14,7 +13,25 @@ const UserSchema = new mongoose.Schema({
         points: { type: Number, default: 0 },
         membership: { type: String, default: 'free' },
         badges: [String]
-    }
+    },
+    performance:[{
+        subject: {type: String},
+        score: {type: Number},
+        points: {types: Number},
+        createdAt: {
+            type: Date,
+            default: Date.now,
+          }
+    }],
+    reward: [{
+        points: { type: Number },
+        type: {type: String},
+        amount: {type: String},
+        createdAt: {
+            type: Date,
+            default: Date.now,
+          }
+    }]
 });
 
 UserSchema.methods.generateAuthToken = function () {
@@ -25,9 +42,6 @@ UserSchema.methods.generateAuthToken = function () {
     return token;
 };
 
-UserSchema.methods.validatePassword = async function (password) {
-   return await bcrypt.compare(password, this.password);
-};
 
 const User = mongoose.model('User', UserSchema);
 
