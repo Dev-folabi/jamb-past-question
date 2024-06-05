@@ -9,7 +9,7 @@ const registerUser = async (req, res) => {
         const { error } = validateUser(req.body);
         if (error) return res.status(400).json({ error: error.details[0].message });
 
-        const { firstName, lastName, gender, username, email, password, phone } = req.body;
+        const { name, gender, username, email, password, phone } = req.body;
 
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ msg: 'Email already exists' });
@@ -25,7 +25,7 @@ const registerUser = async (req, res) => {
         await user.save();
 
         const token = user.generateAuthToken();
-        const picked = _.pick(user, ['firstName', 'lastName', 'gender', 'username', 'email', 'phone', 'profile']);
+        const picked = _.pick(user, ['name', 'gender', 'username', 'email', 'phone', 'profile']);
 
         res.status(201).json({ msg: 'User registered successfully', token, user: picked });
     } catch (err) {
