@@ -25,7 +25,7 @@ const registerUser = async (req, res) => {
         await user.save();
 
         const token = user.generateAuthToken();
-        const picked = _.pick(user, ['name', 'gender', 'username', 'email', 'phone', 'profile']);
+        const picked = _.pick(user, ['_id', 'name', 'gender', 'username', 'email', 'phone', 'profile']);
 
         res.status(201).json({ msg: 'User registered successfully', token, user: picked });
     } catch (err) {
@@ -50,7 +50,7 @@ const login = async (req, res) => {
 
         const token = user.generateAuthToken();
 
-        res.status(200).json({ token });
+        res.status(200).json({userID: user._id, token });
     } catch (err) {
         res.status(500).json({ msg: 'Server error', err });
     }
@@ -62,7 +62,7 @@ const getUserProfile = async (req, res) => {
         const user = await User.findById(req.params.id).select('profile name email username');
         if (!user) return res.status(404).json({ msg: 'User not found' });
 
-        const picked = _.pick(user, ['name', 'gender', 'username', 'email', 'phone', 'profile']);
+        const picked = _.pick(user, ['_id','name', 'gender', 'username', 'email', 'phone', 'profile']);
 
         res.status(200).json(picked);
     } catch (err) {
