@@ -11,7 +11,8 @@ const UserSchema = new mongoose.Schema({
     profile: {
         points: { type: Number, default: 0 },
         membership: { type: String, default: 'free' },
-        badges: [String]
+        badges: [String],
+        rewardCount: {type: Number, default: 0}
     },
     performance: [{
         subject: { type: String },

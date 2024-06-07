@@ -25,7 +25,8 @@ app.use(cors());
 // Routes
 app.use('/api/user', require('./routes/usersRoute'));
 app.use('/api/performance', require('./routes/performanceRoute'));
-app.use('/api/reward/', require('./routes/vtuRoute'))
+app.use('/api/reward', require('./routes/rewardRoute'))
+// app.use('/api/reward/', require('./routes/vtuRoute'))
 
 
 mongoDB().then(() => {

@@ -1,7 +1,7 @@
-const express = require('express');
-const { data } = require('../utils/vtu');
-const router = express.Router()
+// const express = require('express');
+// const { data } = require('../utils/vtu');
+// const router = express.Router()
 
-router.post('/data', data)
+// router.post('/data', data)
 
-module.exports = router
+// module.exports = router
