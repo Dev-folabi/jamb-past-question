@@ -1,5 +1,5 @@
 const express = require('express');
-const User = require('../model/userModel'); // Update with the correct path to your user model
+const User = require('../model/userModel');
 const axios = require('axios');
 require('dotenv').config();
 
@@ -47,11 +47,11 @@ function generateRandompayRef(length) {
 // Route to initialize a transaction
 router.post('/initialize-transaction/:id', async (req, res) => {
     try {
-        const {customerName, customerEmail } = req.body;
+        const { customerName, customerEmail } = req.body;
 
         // Check for required fields
-        if ( !customerName || !customerEmail) {
-            return res.status(400).json({ error: 'customerName, and customerEmail are required fields' });
+        if (!customerName || !customerEmail) {
+            return res.status(400).json({ error: 'customerName and customerEmail are required fields' });
         }
 
         // Generate a random payment reference
@@ -76,7 +76,7 @@ router.post('/initialize-transaction/:id', async (req, res) => {
         });
 
         if (response.data.requestSuccessful) {
-            res.json(response.data);
+            res.status(200).json(response.data.responseBody.checkoutUrl);
         } else {
             console.error('Monnify error response:', response.data);
             res.status(500).json({ error: response.data.responseMessage || 'An error occurred' });
@@ -87,12 +87,14 @@ router.post('/initialize-transaction/:id', async (req, res) => {
     }
 });
 
+
+
 // Route to handle the redirect after payment
 router.get('/payment-response/:id', async (req, res) => {
-    const { paymentReference, paymentStatus } = req.query;
+    const { paymentReference } = req.query;
 
-    if (!paymentReference || !paymentStatus) {
-        return res.status(400).json({ error: 'Payment reference and status are required' });
+    if (!paymentReference) {
+        return res.status(400).json({ error: 'Payment reference required' });
     }
 
     try {
@@ -102,17 +104,69 @@ router.get('/payment-response/:id', async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        if (paymentStatus === 'PAID') {
-            user.profile.membership = 'premium';
-            await user.save();
-            res.json({ message: 'Payment successful', membership: user.profile.membership });
+        const authToken = await getAuthToken();
+
+        const response = await axios.get(`${MONNIFY_BASE_URL}/merchant/transactions/query?paymentReference=${paymentReference}`, {
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        });
+
+        if (response.data.requestSuccessful) {
+            const paymentStatus = response.data.responseBody.paymentStatus;
+
+            if (paymentStatus === 'PAID') {
+                user.profile.membership = 'premium';
+                await user.save();
+                res.status(200).json({ message: 'Payment successful', membership: user.profile.membership });
+            } else {
+                res.status(500).json({ message: 'Payment failed' });
+            }
         } else {
-            res.send('Payment failed');
+            console.error('Monnify error response:', response.data);
+            res.status(500).json({ error: response.data.responseMessage || 'An error occurred' });
         }
     } catch (error) {
-        console.error('Error handling payment response:', error);
+        console.error('Error handling payment response:', error.response ? error.response.data : error.message);
         res.status(500).json({ error: 'An error occurred while processing the payment response' });
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+// router.get('/payment-response/:id', async (req, res) => {
+//     const { paymentReference } = req.query;
+
+//     if (!paymentReference ) {
+//         return res.status(400).json({ error: 'Payment reference required' });
+//     }
+
+//     try {
+//         const user = await User.findById(req.params.id);
+
+//         if (!user) {
+//             return res.status(404).json({ error: 'User not found' });
+//         }
+
+//         if (paymentStatus === 'success') {
+//             user.profile.membership = 'premium';
+//             await user.save();
+//             res.json({ message: 'Payment successful', membership: user.profile.membership });
+//         } else {
+//             res.send('Payment failed');
+//         }
+//     } catch (error) {
+//         console.error('Error handling payment response:', error);
+//         res.status(500).json({ error: 'An error occurred while processing the payment response' });
+//     }
+// });
 
 module.exports = router;
