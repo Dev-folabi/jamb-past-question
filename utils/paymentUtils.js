@@ -118,7 +118,8 @@ router.get('/payment-response/:id', async (req, res) => {
             if (paymentStatus === 'PAID') {
                 user.profile.membership = 'premium';
                 await user.save();
-                res.status(200).json({ message: 'Payment successful', membership: user.profile.membership });
+
+                res.redirect('https://www.edustack.com.ng');
             } else {
                 res.status(500).json({ message: 'Payment failed' });
             }
