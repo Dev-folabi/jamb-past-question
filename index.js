@@ -15,10 +15,19 @@ if (!process.env.JWT_PRIVATE_KEY) {
     process.exit(1);
 }
 
+const corsOptions = {
+    origin: ['http://localhost:3000', 'https://www.jambfocus.com'], // Allow only this origin
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', 
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+    credentials: true, 
+};
+
+// Use the CORS middleware with custom options
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
-
+app.use(cors(corsOptions));
 
 
 
