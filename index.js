@@ -17,7 +17,7 @@ if (!process.env.JWT_PRIVATE_KEY) {
 //     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 //     allowedHeaders: ['Content-Type', 'Authorization'],
 //     credentials: true,
-};
+//};
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
