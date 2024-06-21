@@ -13,7 +13,7 @@ if (!process.env.JWT_PRIVATE_KEY) {
 }
 
 const corsOptions = {
-    origin: ['http://localhost:3000', 'https://www.jambfocus.com'],
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
