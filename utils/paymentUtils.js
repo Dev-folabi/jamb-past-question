@@ -119,9 +119,9 @@ router.get('/payment-response/:id', async (req, res) => {
                 user.profile.membership = 'premium';
                 await user.save();
 
-                res.redirect('https://www.edustack.com.ng');
+                res.redirect('https://www.jambfocus.com/admin/profile');
             } else {
-                res.status(500).json({ message: 'Payment failed' });
+                res.status(500).redirect('https://www.jambfocus.com/admin/profile');
             }
         } else {
             console.error('Monnify error response:', response.data);
