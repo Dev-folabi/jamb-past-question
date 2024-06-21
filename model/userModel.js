@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     phone: {type: String},
     profile: {
-        totalReward: {type: Number, default: 0},
+        withdrawReward: {type: Number, default: 0},
         points: { type: Number, default: 0 },
         membership: { type: String, default: 'free' },
         badges: [String],

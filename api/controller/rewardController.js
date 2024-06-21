@@ -9,7 +9,7 @@ const reward = async (req, res) => {
 
         user.profile.rewardCount += 1;
         user.profile.points -= points;
-    user.profile.totalReward += points;
+    user.profile.withdrawReward += points;
 
         user.reward.push({points, type, amount})
     
