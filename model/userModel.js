@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
     profile: {
         withdrawReward: {type: Number, default: 0},
         points: { type: Number, default: 0 },
-        membership: { type: String, default: 'free' },
+        membership: { type: String, default: 'Free' },
         badges: [String],
         rewardCount: {type: Number, default: 0}
     },

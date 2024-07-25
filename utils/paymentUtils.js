@@ -64,7 +64,7 @@ router.post('/initialize-transaction/:id', async (req, res) => {
             customerName,
             customerEmail,
             paymentReference: paymentRef,
-            paymentDescription: "Jamb past question",
+            paymentDescription: "Jamb Focus",
             currencyCode: "NGN",
             contractCode: MONNIFY_CONTRACT_CODE,
             redirectUrl: `${REDIRECT_URL}/${req.params.id}`, 
@@ -116,7 +116,7 @@ router.get('/payment-response/:id', async (req, res) => {
             const paymentStatus = response.data.responseBody.paymentStatus;
 
             if (paymentStatus === 'PAID') {
-                user.profile.membership = 'premium';
+                user.profile.membership = 'Premium';
                 await user.save();
 
                 res.redirect('https://www.jambfocus.com/admin/profile');
