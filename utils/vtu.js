@@ -1,134 +1,143 @@
-// const axios = require('axios');
+const axios = require('axios');
+require('dotenv').config();
 
-// require('dotenv').config()
+const authToken = process.env.N3TDATA_TOKEN;
 
-// // API credentials
-// const API_KEY = process.env.API_KEY;
-// const API_TOKEN = process.env.API_TOKEN;
+if (!authToken) {
+    console.error('Missing N3TDATA_TOKEN environment variable');
+    process.exit(1);
+}
 
-// // Endpoint to recharge airtime
-// const airtime = async (req, res) => {
-//     // Extract parameters from request body
-//     const { operator, type, value, phone } = req.body;
-    
-//     // Prepare the request data
-//     const data = {
-//         operator: operator,
-//         type: type || 'airtime',
-//         value: value ,
-//         phone: phone 
-//     };
+// Function to generate a random request-id
+function generateRequestId(length) {
+    const characters = '0123456789';
+    let requestId = '';
 
-//     // Prepare request headers
-//     const headers = {
-//         'Api-Token': API_TOKEN,
-//         'Request-Id': Date.now().toString(),
-//         'Content-Type': 'application/x-www-form-urlencoded'
-//     };
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        requestId += characters.charAt(randomIndex);
+    }
 
-//     try {
-//         // Send POST request to the API
-//         const response = await axios.post(`https://api.mobilevtu.com/v1/${API_KEY}/topup`, new URLSearchParams(data), { headers });
-        
-//         // Parse the JSON response
-//         const json_output = response.data;
-        
-//         if (json_output.status === 'success') {
-//             // If request was successful, respond with transaction details
-//             res.json({
-//                 transaction_reference: json_output.data.transaction_id,
-//                 transaction_status: json_output.data.transaction_status
-//             });
-//         } else {
-//             // If there was an error, respond with the error message
-//             res.status(400).send(json_output.message);
-//         }
-//     } catch (error) {
-//         // Handle connection errors
-//         res.status(500).send('Connection error occurred! ' + error.message);
-//     }
-// }
+    return requestId;
+}
 
+// Data Request Function
+exports.dataRequest = async (network, phone, dataPlan) => {
+    try {
+        let networkPlan;
+        let dataPlanId;
 
-// // Endpoint to buy data subscription
+        switch (network) {
+            case "MTN":
+                networkPlan = 1;
+                break;
+            case "AIRTEL":
+                networkPlan = 2;
+                break;
+            case "GLO":
+                networkPlan = 3;
+                break;
+            case "9MOBILE":
+                networkPlan = 4;
+                break;
+            default:
+                throw new Error('Unsupported network');
+        }
 
-// const data = async (req, res) => {
-// const {network_id, mobile_number, plan_id } = req.body
+        switch (dataPlan) {
+            case "500MB":
+                dataPlanId = 69;
+                break;
+            case "1GB":
+                dataPlanId = 68;
+                break;
+            case "2GB":
+                dataPlanId = 67;
+                break;
+            case "3GB":
+                dataPlanId = 66;
+                break;
+            default:
+                throw new Error('Unsupported data plan');
+        }
 
-//     try {
-//         const data = `{"network":${network_id},\r\n"mobile_number":${mobile_number},\r\n"plan": ${plan_id},\r\n"Ported_number":true\r\n}`;
-        
-//         const config = {
-//           method: 'post',
-//         maxBodyLength: Infinity,
-//           url: 'https://vtukonnect.com/api/data/',
-//           headers: { 
-//             'Authorization': 'Token  b28c052c8a2a4838ae11e06444550011d0f80cb3', 
-//             'Content-Type': 'application/json'
-//           },
-//           data : data
-//         };
-        
-//         axios(config)
-//         .then(function (response) {
-//           console.log(JSON.stringify(response.data));
-//         })
-//         .catch(function (error) {
-//           console.log(error);
-//         });
-        
-        
-//     } catch (error) {
-//         // Handle connection errors
-//         res.status(500).send('Connection error occurred! ' + error.message);
-//     }
-// }
+        const requestId = generateRequestId(11);
+        const payload = {
+            network: networkPlan,
+            phone,
+            data_plan: dataPlanId,
+            bypass: false,
+            'request-id': `Data_${requestId}`
+        };
 
+        const response = await axios.post(
+            'https://n3tdata.com/api/data',
+            payload,
+            {
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
 
-// // const data = async (req, res) => {
-// //     // Extract parameters from request body
-// //     const { operator, type, value, phone } = req.body;
+        console.log("Data:", response.data);
 
-// //     // Prepare the request data
-// //     const data = {
-// //         operator: operator,
-// //         type: type || 'data',
-// //         value: value ,
-// //         phone: phone 
-// //     };
+        return response.data;
+    } catch (error) {
+        console.error('Error sending data request:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+}
 
-// //     // Prepare request headers
-// //     const headers = {
-// //         'Api-Token': API_TOKEN,
-// //         'Request-Id': Date.now().toString(),
-// //         'Content-Type': 'application/x-www-form-urlencoded'
-// //     };
+// Airtime Request Function
+exports.airtimeRequest = async (network, phone, amount) => {
+    try {
+        let networkPlan;
 
-// //     try {
-// //         // Send POST request to the API
-// //         const response = await axios.post(`https://api.mobilevtu.com/v1/${API_KEY}/topup`, new URLSearchParams(data), { headers });
-        
-// //         // Parse the JSON response
-// //         const json_output = response.data;
-        
-// //         if (json_output.status === 'success') {
-// //             // If request was successful, respond with transaction details
-// //             res.json({
-// //                 transaction_reference: json_output.transaction_id,
-// //                 transaction_status: json_output.transaction_status
-// //             });
-// //         } else {
-// //             // If there was an error, respond with the error message
-// //             res.status(400).send(json_output.message);
-// //         }
-// //     } catch (error) {
-// //         // Handle connection errors
-// //         res.status(500).send('Connection error occurred! ' + error.message);
-// //     }
-// // }
+        switch (network) {
+            case "MTN":
+                networkPlan = 1;
+                break;
+            case "AIRTEL":
+                networkPlan = 2;
+                break;
+            case "GLO":
+                networkPlan = 3;
+                break;
+            case "9MOBILE":
+                networkPlan = 4;
+                break;
+            default:
+                throw new Error('Unsupported network');
+        }
 
+        const requestId = generateRequestId(11);
+        const payload = {
+            network: networkPlan,
+            phone,
+            plan_type: "VTU",
+            bypass: false,
+            amount,
+            'request-id': `Airtime_${requestId}`
+        };
 
-// module.exports = {
-//     airtime,
-//     data
-// }
+        const response = await axios.post(
+            'https://n3tdata.com/api/topup',
+            payload,
+            {
+                headers: {
+                    'Authorization': `Token ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        console.log("Airtime:", response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error('Error sending Airtime request:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+}

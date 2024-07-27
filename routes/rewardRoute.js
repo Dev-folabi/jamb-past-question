@@ -1,8 +1,11 @@
 const express = require('express')
-const { reward, getReward } = require('../api/controller/rewardController')
+const {  getReward, dataReward, airtimeReward } = require('../api/controller/rewardController')
 const router = express.Router()
 
-router.post('/:id', reward);
+router.post('/data/:id', dataReward);
+
+router.post('/airtime/:id', airtimeReward);
+
 router.get('/:id', getReward);
 
 module.exports = router 
